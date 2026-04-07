@@ -1,0 +1,82 @@
+<div class="custom-toast" *ngIf="toast" [ngClass]="toast.type">
+  {{ toast.message }}
+</div>
+
+<div class="modal-overlay" *ngIf="rejectingTicketId">
+  <div class="modal-card">
+    <h3 style="color: var(--danger); margin-top: 0;">Reject Ticket #{{ rejectingTicketId }}</h3>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Please provide a reason so the user understands why this was closed.</p>
+    
+    <label>Reason for Rejection <span class="text-danger">*</span></label>
+    <textarea [(ngModel)]="rejectReason" class="modern-input" rows="3" placeholder="e.g., Missing account ID..."></textarea>
+    
+    <div class="modal-actions">
+      <button class="btn-outline" (click)="cancelReject()">Cancel</button>
+      <button class="btn-danger" (click)="confirmReject()" [disabled]="!rejectReason.trim()">Confirm Rejection</button>
+    </div>
+  </div>
+</div>
+
+<div class="main-content">
+  <div class="summary-row">
+    <div class="stat-card pending"><h3>Pending</h3><h2>{{ pendingCount }}</h2></div>
+    <div class="stat-card solved"><h3>Solved</h3><h2>{{ solvedCount }}</h2></div>
+    <div class="stat-card rejected"><h3>Not an Issue</h3><h2>{{ rejectedCount }}</h2></div>
+  </div>
+
+  <div class="card controls-card">
+    <div class="search-box">
+      <label>Search Tickets:</label>
+      <input type="text" [(ngModel)]="searchQuery" class="modern-input" placeholder="Search ID, Division, Issue, or Details...">
+    </div>
+    <div class="filter-box">
+      <label>Filter by Status:</label>
+      <select [(ngModel)]="statusFilter" class="modern-select">
+        <option value="All">All Tickets</option>
+        <option value="Pending">Pending</option>
+        <option value="Solved">Solved</option>
+        <option value="Not an Issue">Not an Issue</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>ID & Date</th><th>Division / Issue</th><th>User Submitted Data</th><th>Attachments</th><th>Status & Notes</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredTickets.length === 0">
+          <td colspan="6" style="text-align: center; padding: 40px; color: #888;">No tickets match your search filters.</td>
+        </tr>
+        <tr *ngFor="let ticket of filteredTickets">
+          <td><strong style="color: var(--primary-color);">#{{ ticket.id }}</strong><br><small style="color: #666;">{{ ticket.created_at | date:'short' }}</small></td>
+          <td><strong>{{ ticket.division_name }}</strong><br>{{ ticket.issue_part_name }}</td>
+          <td>
+            <ul class="data-list">
+              <li *ngFor="let key of objectKeys(ticket.dynamic_data)"><strong>{{ key | titlecase }}:</strong> {{ ticket.dynamic_data[key] }}</li>
+            </ul>
+          </td>
+          <td>
+            <a *ngIf="ticket.screenshot" [href]="ticket.screenshot" target="_blank" class="link-badge">📷 Image</a>
+            <a *ngIf="ticket.audio_record" [href]="ticket.audio_record" target="_blank" class="link-badge">🎙️ Audio</a>
+            <span *ngIf="!ticket.screenshot && !ticket.audio_record" style="color:#aaa; font-size: 0.85rem;">None</span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="ticket.status.toLowerCase().replace(' ', '-')">{{ ticket.status }}</span>
+            <div *ngIf="ticket.admin_notes" class="reason-note"><strong>Note:</strong> {{ ticket.admin_notes }}</div>
+          </td>
+          <td>
+            <div class="action-stack">
+              <button *ngIf="ticket.status !== 'Solved'" (click)="changeStatus(ticket.id, 'Solved')" class="btn-sm btn-success">Mark Solved</button>
+              <button *ngIf="ticket.status !== 'Not an Issue'" (click)="changeStatus(ticket.id, 'Not an Issue')" class="btn-sm btn-danger">Reject</button>
+              <button *ngIf="ticket.status !== 'Pending'" (click)="changeStatus(ticket.id, 'Pending')" class="btn-sm btn-outline">Re-open</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

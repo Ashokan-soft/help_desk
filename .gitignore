@@ -1,0 +1,82 @@
+# =========================
+# ROOT LEVEL
+# =========================
+.env
+*.log
+*.sqlite3
+*.pyc
+__pycache__/
+db.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# =========================
+# DJANGO BACKEND
+# =========================
+backend/
+
+# Python cache
+backend/__pycache__/
+backend/**/*.pyc
+
+# Virtual environment
+backend/venv/
+backend/env/
+backend/.venv/
+
+# Django stuff
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+backend/static/
+
+# Environment variables
+backend/.env
+
+# Migrations (optional - if you want ignore)
+# backend/**/migrations/
+# !backend/**/migrations/__init__.py
+
+# =========================
+# ANGULAR FRONTEND
+# =========================
+frontend/angular/
+
+# Node modules
+frontend/angular/node_modules/
+
+# Angular build output
+frontend/angular/dist/
+frontend/angular/build/
+
+# Angular cache
+frontend/angular/.angular/
+
+# Logs
+frontend/angular/npm-debug.log*
+frontend/angular/yarn-debug.log*
+frontend/angular/yarn-error.log*
+
+# IDE files
+frontend/angular/.vscode/
+frontend/angular/.idea/
+
+# Environment files (optional)
+frontend/angular/src/environments/*.ts
+
+# =========================
+# GENERAL IDE / EDITOR
+# =========================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# =========================
+# TEST / COVERAGE
+# =========================
+coverage/

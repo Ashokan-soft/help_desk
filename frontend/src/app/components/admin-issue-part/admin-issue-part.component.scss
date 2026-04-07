@@ -1,0 +1,42 @@
+/* --- CUSTOM UI TOAST --- */
+.custom-toast {
+  position: fixed; top: 20px; right: 20px; padding: 16px 24px; border-radius: 8px;
+  color: white; font-weight: 600; z-index: 9999; animation: slideIn 0.3s ease-out; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  &.success { background-color: #10b981; }
+  &.error { background-color: #ef4444; }
+}
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Navigation Tabs */
+.tab-nav { 
+  display: flex; padding: 0; overflow: hidden; margin-bottom: 25px; 
+  button { 
+    flex: 1; padding: 18px; background: #f8fafc; border: none; border-bottom: 4px solid transparent; 
+    font-size: 1.05rem; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; 
+    &:hover { background: #f1f5f9; } 
+    &.active { background: white; color: var(--primary-color); border-bottom-color: var(--primary-color); } 
+  } 
+}
+
+/* Validations */
+.text-danger { color: #dc3545; } 
+.is-invalid { border-color: #dc3545 !important; background-color: #fff8f8; }
+
+/* Tables */
+.controls-card { padding: 20px; background: white; }
+.table-card { padding: 0; overflow-x: auto; } 
+.modern-table { width: 100%; border-collapse: collapse; text-align: left; } 
+.modern-table th, .modern-table td { padding: 15px; border-bottom: 1px solid var(--border-color); vertical-align: middle; } 
+.modern-table th { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; }
+
+/* Buttons & Badges */
+.btn-sm { padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; border: none; cursor: pointer; font-weight: 600; } 
+.btn-edit { background: #e2e8f0; color: #334155; &:hover { background: #cbd5e1; } }
+.badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block; } 
+.badge.pending { background: #fef3c7; color: #b45309; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) { 
+  .basic-details, .field-grid { grid-template-columns: 1fr !important; } 
+  .tab-nav { flex-direction: column; button { border-bottom: none; border-left: 4px solid transparent; text-align: left; } button.active { border-left-color: var(--primary-color); } } 
+}

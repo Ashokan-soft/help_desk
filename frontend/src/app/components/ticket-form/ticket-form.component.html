@@ -1,0 +1,83 @@
+<div class="card" style="max-width: 650px; margin: auto;">
+  <h2>Submit a HelpDesk Ticket 🎧</h2>
+  <p style="color: var(--text-muted); margin-bottom: 30px;">Select your issue below and provide the required details so our team can assist you instantly.</p>
+
+  <div style="margin-bottom: 20px;">
+    <label>1. Select Division</label>
+    <select (change)="onDivisionChange($event)" class="modern-select">
+      <option value="">-- Choose Division --</option>
+      <option *ngFor="let div of divisions" [value]="div.id">{{ div.name }}</option>
+    </select>
+  </div>
+
+  <div *ngIf="issueParts.length > 0" style="margin-bottom: 25px; animation: fadeIn 0.3s ease;">
+    <label>2. What is the specific issue?</label>
+    <select (change)="onIssuePartChange($event)" class="modern-select">
+      <option value="">-- Choose Issue --</option>
+      <option *ngFor="let part of issueParts" [value]="part.id">{{ part.name }}</option>
+    </select>
+  </div>
+
+  <form *ngIf="currentSchema.length > 0" [formGroup]="dynamicForm" (ngSubmit)="onSubmit()" style="animation: fadeIn 0.4s ease;">
+    
+    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 25px; margin-bottom: 25px;">
+      <h3>Required Information</h3>
+      
+      <div *ngFor="let field of currentSchema" style="margin-bottom: 20px;">
+        <label>
+          {{ field.label }} 
+          <span *ngIf="field.required" style="color: var(--danger);">*</span>
+        </label>
+
+        <input *ngIf="field.type === 'text'" type="text" [formControlName]="field.name" class="modern-input" placeholder="Enter {{field.label}}">
+        <input *ngIf="field.type === 'number'" type="number" [formControlName]="field.name" class="modern-input" placeholder="Enter a number">
+        <textarea *ngIf="field.type === 'textarea'" [formControlName]="field.name" rows="4" class="modern-input" placeholder="Provide details..."></textarea>
+        <select *ngIf="field.type === 'select'" [formControlName]="field.name" class="modern-select">
+          <option value="">-- Select Option --</option>
+          <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="selectedIssuePartObj?.requires_image || selectedIssuePartObj?.requires_audio" style="margin-bottom: 30px;">
+      <h3>Attachments</h3>
+      
+      <div *ngIf="selectedIssuePartObj?.requires_image" style="margin-bottom: 20px;">
+        <label>📷 Upload Screenshot Reference (Optional)</label>
+        <input type="file" accept="image/*" (change)="onFileChange($event, 'image')" class="modern-input" style="padding: 8px;">
+      </div>
+
+      <div *ngIf="selectedIssuePartObj?.requires_audio" style="margin-bottom: 15px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff;">
+        <label style="display: block; font-weight: 600; margin-bottom: 10px;">🎙️ Record a Voice Note (Optional)</label>
+        
+        <div *ngIf="!audioUrl" style="display: flex; gap: 10px; align-items: center;">
+          <button type="button" *ngIf="!isRecording" (click)="startRecording()" class="btn-primary" style="background-color: #ef4444; padding: 10px 15px;">
+            🔴 Start Recording
+          </button>
+          
+          <button type="button" *ngIf="isRecording" (click)="stopRecording()" class="btn-primary pulse-anim" style="background-color: #1e293b; padding: 10px 15px;">
+            ⏹️ Stop Recording
+          </button>
+          
+          <span *ngIf="isRecording" style="color: #ef4444; font-weight: bold; animation: pulseText 1.5s infinite;">Recording... Speak now.</span>
+        </div>
+
+        <div *ngIf="audioUrl" style="display: flex; flex-direction: column; gap: 10px;">
+          <audio [src]="audioUrl" controls style="width: 100%; outline: none;"></audio>
+          <button type="button" (click)="clearAudio()" class="btn-outline" style="align-self: flex-start; padding: 6px 12px; font-size: 0.9rem;">
+            🗑️ Discard & Re-record
+          </button>
+        </div>
+
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); font-size: 0.9rem;">
+          <label style="color: var(--text-muted); font-weight: normal; display: block; margin-bottom: 5px;">Or upload an existing audio file:</label>
+          <input type="file" accept="audio/*" (change)="onFileChange($event, 'audio')" class="modern-input" style="padding: 6px; font-size: 0.9rem;">
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary" [disabled]="dynamicForm.invalid || isSubmitting" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+      {{ isSubmitting ? 'Submitting...' : 'Securely Submit Ticket 🚀' }}
+    </button>
+  </form>
+</div>

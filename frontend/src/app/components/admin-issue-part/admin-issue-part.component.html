@@ -1,0 +1,128 @@
+<div class="custom-toast" *ngIf="toast" [ngClass]="toast.type">
+  {{ toast.message }}
+</div>
+
+<div class="admin-container" style="max-width: 1000px; margin: auto;">
+  
+  <div class="tab-nav card">
+    <button [class.active]="activeTab === 'list'" (click)="activeTab = 'list'">📋 View Existing Issues</button>
+    <button [class.active]="activeTab === 'form'" (click)="openCreateForm()">➕ Create New Issue Part</button>
+  </div>
+
+  <div *ngIf="activeTab === 'list'">
+    <div class="card controls-card" style="margin-bottom: 20px;">
+      <label>Search Existing Issues:</label>
+      <input type="text" [(ngModel)]="searchQuery" class="modern-input" placeholder="Search by Issue Name or Division...">
+    </div>
+
+    <div class="card table-card">
+      <table class="modern-table">
+        <thead>
+          <tr><th>Division</th><th>Issue Name</th><th>Total Fields</th><th>Media Options</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredIssueParts.length === 0">
+            <td colspan="5" class="text-center" style="padding: 40px; color: #888;">No issue parts found matching your criteria.</td>
+          </tr>
+          <tr *ngFor="let part of filteredIssueParts">
+            <td><strong>{{ part.division_name || 'Unknown' }}</strong></td>
+            <td>{{ part.name }}</td>
+            <td><span class="badge pending">{{ part.form_schema.length || 0 }} fields</span></td>
+            <td>
+              <span *ngIf="part.requires_image" title="Image Allowed">📷</span>
+              <span *ngIf="part.requires_audio" title="Audio Allowed">🎙️</span>
+              <span *ngIf="!part.requires_image && !part.requires_audio" style="color:#aaa;">None</span>
+            </td>
+            <td><button class="btn-sm btn-edit" (click)="editIssuePart(part)">Edit Schema</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="activeTab === 'form'" class="card form-tab">
+    <h2 style="margin-bottom: 25px;">{{ isEditing ? 'Edit Issue Part Schema' : 'Design New Issue Part' }}</h2>
+    
+    <form [formGroup]="issuePartForm" (ngSubmit)="onSubmit()">
+      <div class="basic-details" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label>Select Division <span class="text-danger">*</span></label>
+          <select formControlName="division" class="modern-select" [ngClass]="{'is-invalid': formSubmitted && issuePartForm.get('division')?.invalid}">
+            <option value="">-- Choose --</option>
+            <option *ngFor="let div of divisions" [value]="div.id">{{ div.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Issue Part Name <span class="text-danger">*</span></label>
+          <input type="text" formControlName="name" placeholder="e.g., Membership Activation" class="modern-input" [ngClass]="{'is-invalid': formSubmitted && issuePartForm.get('name')?.invalid}">
+        </div>
+      </div>
+
+      <div class="file-toggles" style="display: flex; gap: 30px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 20px;">
+        <div class="checkbox-group">
+          <input type="checkbox" formControlName="requires_image" id="req_img">
+          <label for="req_img" style="display: inline; margin-left: 8px;">Allow User to Upload Screenshot</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" formControlName="requires_audio" id="req_aud">
+          <label for="req_aud" style="display: inline; margin-left: 8px;">Allow User to Record Audio Note</label>
+        </div>
+      </div>
+
+      <hr style="margin: 30px 0; border: 0; border-top: 1px solid var(--border-color);">
+
+      <div class="schema-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">Form Fields (Inputs requested from user)</h3>
+        <button type="button" class="btn-sm btn-success" (click)="addField()">+ Add Field</button>
+      </div>
+      
+      <div *ngIf="formSubmitted && formSchema.length === 0" class="error-banner" style="background: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 6px; margin-bottom: 15px; text-align: center;">
+        You must add at least one field below!
+      </div>
+
+      <div formArrayName="form_schema">
+        <div class="field-card" *ngFor="let field of formSchema.controls; let i=index" [formGroupName]="i" style="background: #f8fafc; border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <div class="field-header" style="display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold;">
+            <span style="color: var(--primary-color);">Field #{{ i + 1 }}</span>
+            <button type="button" class="btn-sm btn-danger" (click)="removeField(i)">Remove</button>
+          </div>
+          <div class="field-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            
+            <div class="form-group">
+              <label>Field Label <span class="text-danger">*</span></label>
+              <input type="text" formControlName="label" (input)="autoGenerateKey(i)" class="modern-input" [ngClass]="{'is-invalid': formSubmitted && field.get('label')?.invalid}">
+            </div>
+            
+            <div class="form-group">
+              <label>Database Key (Auto-generated) <span class="text-danger">*</span></label>
+              <input type="text" formControlName="name" class="modern-input" [ngClass]="{'is-invalid': formSubmitted && field.get('name')?.invalid}">
+            </div>
+            
+            <div class="form-group">
+              <label>Input Type <span class="text-danger">*</span></label>
+              <select formControlName="type" class="modern-select">
+                <option value="text">Text Box</option>
+                <option value="number">Number</option> <option value="textarea">Text Area</option>
+                <option value="select">Dropdown Select</option>
+              </select>
+            </div>
+            
+            <div class="form-group" *ngIf="field.get('type')?.value === 'select'">
+              <label>Dropdown Options (Comma separated)</label>
+              <input type="text" formControlName="options" placeholder="A, B, C" class="modern-input" [ngClass]="{'is-invalid': formSubmitted && field.get('options')?.invalid}">
+            </div>
+          </div>
+          <div class="checkbox-group" style="margin-top: 15px;">
+            <input type="checkbox" formControlName="required" id="req_{{i}}">
+            <label for="req_{{i}}" style="display: inline; margin-left: 8px;">Is this field mandatory?</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons" style="display: flex; gap: 15px; margin-top: 30px;">
+        <button *ngIf="isEditing" type="button" class="btn-outline" (click)="cancelEdit()" style="flex: 1; padding: 12px; border-radius: 8px;">Cancel Edit</button>
+        <button type="submit" class="btn-primary" style="flex: 2; padding: 12px; border-radius: 8px;">{{ isEditing ? 'Update Issue Part Schema' : 'Save & Create Issue Part' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

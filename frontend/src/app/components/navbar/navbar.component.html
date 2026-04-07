@@ -1,0 +1,33 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    
+    <div class="logo" routerLink="/">
+      <span class="logo-icon">🎧</span> 
+      <span class="logo-text">HelpDesk Pro</span>
+    </div>
+
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          Submit Ticket
+        </a>
+      </li>
+      <li>
+        <a routerLink="/admin/divisions" routerLinkActive="active">
+          Divisions (Admin)
+        </a>
+      </li>
+      <li>
+        <a routerLink="/admin/issue-parts" routerLinkActive="active">
+          Issue Parts (Admin)
+        </a>
+      </li>
+      <li>
+        <a routerLink="/admin/dashboard" routerLinkActive="active">
+          Ticket Dashboard
+        </a>
+      </li>
+    </ul>
+
+  </div>
+</nav>

@@ -1,0 +1,21 @@
+<div class="admin-container">
+  <div class="card form-section">
+    <h2>Create New Division</h2>
+    <form [formGroup]="divisionForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Division Name</label>
+        <input type="text" formControlName="name" placeholder="e.g., Plan Activation" class="modern-input">
+      </div>
+      <button type="submit" [disabled]="divisionForm.invalid" class="btn-primary">Save Division</button>
+    </form>
+  </div>
+
+  <div class="card list-section">
+    <h2>Existing Divisions</h2>
+    <ul class="item-list">
+      <li *ngFor="let div of divisions">
+        <span class="id-badge">#{{div.id}}</span> {{ div.name }}
+      </li>
+    </ul>
+  </div>
+</div>
